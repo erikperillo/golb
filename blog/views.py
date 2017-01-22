@@ -1,5 +1,5 @@
 from blog.models import Post, UserProfile, Category
-from blog.forms import UserForm, UserProfileForm 
+from blog.forms import UserForm, UserProfileForm
 
 from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
@@ -7,21 +7,16 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
+from django.template.defaultfilters import slugify
 from django.contrib.auth import logout
 
 
 LIMIT_RECENT_POSTS = 5
 
 def index(request):
-    if request.user.is_authenticated():
-        usr = request.user
-    else:
-        usr = None
-
     return render(request, "index.html", context={
         "categories": Category.objects.all(),
         "posts": Post.objects.all()[:LIMIT_RECENT_POSTS],
-        "user": usr,
         })
 
 def view_post(request, slug):
@@ -42,6 +37,38 @@ def view_category(request, slug):
         "category": category,
         "posts": Post.objects.filter(category=category)[:LIMIT_RECENT_POSTS]
         })
+
+@login_required
+def new_post(request):
+    # If the request is a HTTP POST, try to pull out the relevant information.
+    if request.method == "POST":
+        # Gather the username and password provided by the user.
+        # This information is obtained from the login form.
+        title = request.POST["title"]
+        text = request.POST["text"]
+        categories = request.POST["categories"]
+
+        titles = [c.strip() for c in categories.split(",")]
+        slugs = [slugify(c.strip()) for c in categories.split(",")]
+        if not titles:
+            titles = ["Random"]
+            slugs = [slugify("Random")]
+
+        for slug, title in zip(titles, slugs):
+            category_query = Category.objects.filter(slug=slug)
+            if not category_query:
+                Category(title=title).save()
+                category = Category.objects.filter(title=title).get()
+            else:
+                category = category_query.get()
+
+        author = request.user.userprofile
+        post = Post(title=title, body=text, category=category, author=author)
+        post.save()
+
+        return HttpResponseRedirect("/index")
+    else:
+        return render(request, "new_post.html", context={})
 
 @ensure_csrf_cookie
 def user_login(request):
