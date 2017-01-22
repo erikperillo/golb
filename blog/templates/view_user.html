@@ -1,0 +1,14 @@
+{% extends 'base.html' %} 
+{% block head_title %}Viewing user {{ user.name }}{% endblock %}
+
+{% block content %}
+    {% if posts %}
+        <ul>
+        {% for post in posts %}
+            <li><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>There are no posts for this user.</p>
+    {% endif %}
+{% endblock %}
