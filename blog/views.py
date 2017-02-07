@@ -26,7 +26,6 @@ def view_post(request, slug):
 
 def view_user(request, slug):
     user = get_object_or_404(UserProfile, slug=slug)
-    print(user, "hehe")
     return render(request, "view_user.html", context={
         "user": user,
         "posts": Post.objects.filter(author=user).\
@@ -42,6 +41,7 @@ def view_category(request, slug):
         })
 
 @login_required
+@ensure_csrf_cookie
 def new_post(request):
     # If the request is a HTTP POST, try to pull out the relevant information.
     if request.method == "POST":
@@ -85,6 +85,7 @@ def del_post(request, id):
         return HttpResponseRedirect("/index")
 
 @login_required
+@ensure_csrf_cookie
 def edit_post(request, id):
     try:
         post = Post.objects.filter(pk=id).get()
@@ -98,16 +99,18 @@ def edit_post(request, id):
             {"message": "Not authorized to do that."})
 
     if request.method == "POST":
-        form = PostForm(request.POST)
+        post.delete()
 
+        form = PostForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
             new_post = Post(title=data["title"], body=data["body"],
                 category=data["category"], author=author)
             new_post.save()
-            post.delete()
-
             return view_post(request, new_post.slug)
+        else:
+            post.save()
+            return render(request, "error.html", {"message": "Invalid form."})
     else:
         data = {
             "title": post.title,
@@ -115,7 +118,7 @@ def edit_post(request, id):
             "body": post.body,
         }
         form = PostForm(initial=data)
-        print("GETHEHEHE")
+        print("form:", form, "data:", data)
         return render(request, "edit_post.html", {"form": form, "id": id})
 
 @ensure_csrf_cookie
