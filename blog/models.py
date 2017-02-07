@@ -28,20 +28,20 @@ class Post(models.Model):
 class UserProfile(models.Model):
     #this line is required. links User to a UserProfile model instance
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    slug = models.SlugField(max_length=150, unique=True, default=uuid1)
+    slug = models.SlugField(max_length=150, unique=True)#, default=uuid1)
     website = models.URLField(blank=True)
 
     def __str__(self):
         return self.user.get_username()
         #return self.user.username
 
-    #@permalink
-    #def get_absolute_url(self):
-    #    return ("view_blog_user", None, {"slug": self.slug})
+    @permalink
+    def get_absolute_url(self):
+        return ("view_blog_user", None, {"slug": self.slug})
 
-    #def save(self, **kwargs):
-    #    #self.slug = slugify(self.user.get_username())
-    #    super(UserProfile, self).save(**kwargs)
+    def save(self, **kwargs):
+        self.slug = slugify(self.user.get_username())
+        super(UserProfile, self).save(**kwargs)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

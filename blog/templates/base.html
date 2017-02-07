@@ -8,6 +8,7 @@
                 Welcome, {{ user.username }} |
                 <a href="/logout">Logout</a> |
                 <a href="/new_post">New post</a> |
+                <a href="/user/{{ user.userprofile.slug }}">Profile</a> |
             {% else %}
                 <a href="/login">Login</a> |
             {% endif %}

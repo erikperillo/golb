@@ -1,8 +1,9 @@
 {% extends 'base.html' %} 
-{% block head_title %}Viewing user {{ user.name }}{% endblock %}
 
 {% block content %}
+    <h3>{{ user.user.username }}</h3>
     {% if posts %}
+        <p>Recent posts:</p>
         <ul>
         {% for post in posts %}
             <li><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></li>

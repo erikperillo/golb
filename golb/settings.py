@@ -86,7 +86,7 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
-#AUTH_PROFILE_MODULE = "blog.models.UserProfile"
+AUTH_PROFILE_MODULE = "blog.models.UserProfile"
 
 AUTH_PASSWORD_VALIDATORS = [
     {

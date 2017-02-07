@@ -14,8 +14,9 @@ LIMIT_RECENT_POSTS = 5
 
 def index(request):
     return render(request, "index.html", context={
-        "categories": Category.objects.all(),
-        "posts": Post.objects.all()[:LIMIT_RECENT_POSTS],
+        "categories": Category.objects.all().order_by("title"),
+        "posts": Post.objects.all().\
+            order_by("-date_created")[:LIMIT_RECENT_POSTS],
         })
 
 def view_post(request, slug):
@@ -25,16 +26,19 @@ def view_post(request, slug):
 
 def view_user(request, slug):
     user = get_object_or_404(UserProfile, slug=slug)
+    print(user, "hehe")
     return render(request, "view_user.html", context={
         "user": user,
-        "posts": Post.objects.filter(author=user)[:LIMIT_RECENT_POSTS]
+        "posts": Post.objects.filter(author=user).\
+            order_by("-date_created")[:LIMIT_RECENT_POSTS]
         })
 
 def view_category(request, slug):
     category = get_object_or_404(Category, slug=slug)
     return render(request, "view_category.html", context={
         "category": category,
-        "posts": Post.objects.filter(category=category)[:LIMIT_RECENT_POSTS]
+        "posts": Post.objects.filter(category=category).\
+            order_by("-date_created")[:LIMIT_RECENT_POSTS]
         })
 
 @login_required
@@ -53,7 +57,10 @@ def new_post(request):
                 category=data["category"], author=author)
             post.save()
 
-        return view_post(request, post.slug)
+            return view_post(request, post.slug)
+        else:
+            return render(request, "error.html",
+                {"message": "Invalid form."})
     else:
         form = PostForm()
         return render(request, "new_post.html", {"form": form})
@@ -76,6 +83,40 @@ def del_post(request, id):
                 {"message": "Not authorized to do that."})
     else:
         return HttpResponseRedirect("/index")
+
+@login_required
+def edit_post(request, id):
+    try:
+        post = Post.objects.filter(pk=id).get()
+    except:
+        return render(request, "error.html",
+            {"message": "Error getting post."})
+
+    author = request.user.userprofile
+    if author.pk != post.author.pk:
+        return render(request, "error.html",
+            {"message": "Not authorized to do that."})
+
+    if request.method == "POST":
+        form = PostForm(request.POST)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            new_post = Post(title=data["title"], body=data["body"],
+                category=data["category"], author=author)
+            new_post.save()
+            post.delete()
+
+            return view_post(request, new_post.slug)
+    else:
+        data = {
+            "title": post.title,
+            "category": post.category,
+            "body": post.body,
+        }
+        form = PostForm(initial=data)
+        print("GETHEHEHE")
+        return render(request, "edit_post.html", {"form": form, "id": id})
 
 @ensure_csrf_cookie
 def user_login(request):

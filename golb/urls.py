@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r"^blog/", include("blog.urls"))
 """
 from django.conf.urls import url
+from django.conf.urls import include
 from django.contrib import admin
 import blog.views
 
@@ -24,7 +25,7 @@ urlpatterns = [
     url(r"^blog/post/(?P<slug>[^\.]+).html",
         blog.views.view_post,
         name="view_blog_post"),
-    url(r"^blog/user/(?P<slug>[^\.]+).html",
+    url(r"^user/(?P<slug>[^\.]+)",
         blog.views.view_user,
         name="view_blog_user"),
     url(r"^blog/category/(?P<slug>[^\.]+).html",
@@ -34,4 +35,5 @@ urlpatterns = [
     url(r"^logout/$", blog.views.user_logout, name="logout"),
     url(r"^new_post/$", blog.views.new_post, name="new_post"),
     url(r"^del_post/(?P<id>\d+)/$", blog.views.del_post, name="del_post"),
+    url(r"^edit_post/(?P<id>\d+)/$", blog.views.edit_post, name="edit_post"),
 ]
