@@ -1,5 +1,5 @@
 from blog.models import Post, UserProfile, Category
-from blog.forms import UserForm, UserProfileForm
+from blog.forms import LoginForm, PostForm
 
 from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
@@ -9,7 +9,6 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template.defaultfilters import slugify
 from django.contrib.auth import logout
-
 
 LIMIT_RECENT_POSTS = 5
 
@@ -44,69 +43,73 @@ def new_post(request):
     if request.method == "POST":
         # Gather the username and password provided by the user.
         # This information is obtained from the login form.
-        title = request.POST["title"]
-        text = request.POST["text"]
-        categories = request.POST["categories"]
+        form = PostForm(request.POST)
 
-        titles = [c.strip() for c in categories.split(",")]
-        slugs = [slugify(c.strip()) for c in categories.split(",")]
-        if not titles:
-            titles = ["Random"]
-            slugs = [slugify("Random")]
+        if form.is_valid():
+            data = form.cleaned_data
 
-        for slug, title in zip(titles, slugs):
-            category_query = Category.objects.filter(slug=slug)
-            if not category_query:
-                Category(title=title).save()
-                category = Category.objects.filter(title=title).get()
-            else:
-                category = category_query.get()
+            author = request.user.userprofile
+            post = Post(title=data["title"], body=data["body"],
+                category=data["category"], author=author)
+            post.save()
+
+        return view_post(request, post.slug)
+    else:
+        form = PostForm()
+        return render(request, "new_post.html", {"form": form})
+
+@login_required
+def del_post(request, id):
+    if request.method == "POST":
+        try:
+            post = Post.objects.filter(pk=id).get()
+        except:
+            return render(request, "error.html",
+                {"message": "Error getting post."})
 
         author = request.user.userprofile
-        post = Post(title=title, body=text, category=category, author=author)
-        post.save()
-
-        return HttpResponseRedirect("/index")
+        if author.pk == post.author.pk:
+            post.delete()
+            return render(request, "message.html", {"message": "Post deleted."})
+        else:
+            return render(request, "error.html",
+                {"message": "Not authorized to do that."})
     else:
-        return render(request, "new_post.html", context={})
+        return HttpResponseRedirect("/index")
 
 @ensure_csrf_cookie
 def user_login(request):
-    # If the request is a HTTP POST, try to pull out the relevant information.
     if request.method == "POST":
-        # Gather the username and password provided by the user.
-        # This information is obtained from the login form.
-        username = request.POST["username"]
-        password = request.POST["password"]
+        form = LoginForm(request.POST)
 
-        # Use Django"s machinery to attempt to see if the username/password
-        # combination is valid - a User object is returned if it is.
-        user = authenticate(username=username, password=password)
+        if form.is_valid():
+            user = authenticate(username=form.cleaned_data["user_name"],
+                password=form.cleaned_data["password"])
 
-        # If we have a User object, the details are correct.
-        # If None (Python"s way of representing the absence of a value), no user
-        # with matching credentials was found.
-        if user:
-            # Is the account active? It could have been disabled.
-            if user.is_active:
-                # If the account is valid and active, we can log the user in.
-                # We"ll send the user back to the homepage.
-                login(request, user)
-                return HttpResponseRedirect("/index")
+            #if we have a User object, the details are correct.
+            #if None (Python"s way of representing the absence of a value),
+            #no user with matching credentials was found.
+            if user:
+                #is the account active? it could have been disabled.
+                if user.is_active:
+                    #if the account is valid and active, we can log the user in.
+                    #we'll send the user back to the homepage.
+                    login(request, user)
+                    return HttpResponseRedirect("/index")
+                else:
+                    #an inactive account was used - no logging in!
+                    return render(request, "error.html",
+                        {"message": "Your account is inactive."})
             else:
-                # An inactive account was used - no logging in!
-                return HttpResponse("Your account is disabled.")
+                #bad login details were provided. So we can"t log the user in.
+                return render(request, "error.html",
+                    {"message": "Invalid login details."})
         else:
-            # Bad login details were provided. So we can"t log the user in.
-            print("Invalid login details: {0}, {1}".format(username, password))
-            return HttpResponse("Invalid login details supplied.")
-
-    # The request is not a HTTP POST, so display the login form.
-    # This scenario would most likely be a HTTP GET.
+            return HttpResponse("Invalid form.")
     else:
-        # No context variables to pass to the template system, hence the
-        # blank dictionary object...
-        return render(request, "login.html", context={})
+        form = LoginForm()
+
+    return render(request, "login.html", {"form": form})
 
 @login_required
 def user_logout(request):

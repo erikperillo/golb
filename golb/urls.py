@@ -33,4 +33,5 @@ urlpatterns = [
     url(r"^login/$", blog.views.user_login, name="login"),
     url(r"^logout/$", blog.views.user_logout, name="logout"),
     url(r"^new_post/$", blog.views.new_post, name="new_post"),
+    url(r"^del_post/(?P<id>\d+)/$", blog.views.del_post, name="del_post"),
 ]

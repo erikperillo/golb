@@ -31,8 +31,8 @@ class UserProfile(models.Model):
     slug = models.SlugField(max_length=150, unique=True, default=uuid1)
     website = models.URLField(blank=True)
 
-    #def __str__(self):
-        #return self.user.get_username()
+    def __str__(self):
+        return self.user.get_username()
         #return self.user.username
 
     #@permalink

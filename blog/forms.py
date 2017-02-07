@@ -1,15 +1,11 @@
 from django import forms
-from blog.models import UserProfile
-from django.contrib.auth.models import User
+from blog.models import Post
 
-class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
+class LoginForm(forms.Form):
+    user_name = forms.CharField(label="Username", widget=forms.TextInput())
+    password = forms.CharField(label="Password", widget=forms.PasswordInput())
 
+class PostForm(forms.ModelForm):
     class Meta:
-        model = User
-        fields = ("username", "email", "password")
-
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = UserProfile
-        fields = ("website",)
+        model = Post
+        fields = ("title", "category", "body")
