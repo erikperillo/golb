@@ -1,0 +1,36 @@
+body 
+{
+    background-color: lightgray;
+    padding-left: 15%;
+    padding-right: 15%;
+    font-family: "Lucida Console";
+    font-size: 200%;
+}
+
+hr
+{
+    border: 1px solid darkgray;
+}
+
+#title
+{
+    text-align: center;
+}
+
+#header
+{
+    text-align: center;
+}
+
+.about-box
+{
+    border-left: 1px solid darkgray;
+    text-align: justify;
+}
+
+#profile-pic
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

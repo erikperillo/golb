@@ -1,9 +1,22 @@
+{% load static %}
+
 <html>
     <head>
         <title>{% block head_title %}Golb{% endblock %}</title>
+        <meta charset="UTF-8">
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <!-- jQuery library -->
+        <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script> -->
+        <!-- Latest compiled JavaScript -->
+        <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+        <link rel="stylesheet" type="text/css" href={% static "blog/css/style.css" %}>
+
     </head>
     <body>
-        <p>
+        <div id="header"><h4>
+            Erikoso
+            [
             {% if user.is_authenticated %}
                 Welcome, {{ user.username }} |
                 <a href="/logout">Logout</a> |
@@ -13,9 +26,10 @@
                 <a href="/login">Login</a> |
             {% endif %}
             <a href="/index">Home</a>
-        </p>
+            ]
+        </h4></div>
 
-        <h1>{% block title %}Welcome to my block{% endblock %}</h1>
+        <hr>
 
         {% block content %}
 

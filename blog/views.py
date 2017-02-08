@@ -25,10 +25,10 @@ def view_post(request, slug):
         })
 
 def view_user(request, slug):
-    user = get_object_or_404(UserProfile, slug=slug)
+    user_profile = get_object_or_404(UserProfile, slug=slug)
     return render(request, "view_user.html", context={
-        "user": user,
-        "posts": Post.objects.filter(author=user).\
+        "user": user_profile.user,
+        "posts": Post.objects.filter(author=user_profile).\
             order_by("-date_created")[:LIMIT_RECENT_POSTS]
         })
 

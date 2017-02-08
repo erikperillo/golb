@@ -1,0 +1,48 @@
+body 
+{
+    background-color: lightgray;
+    padding-left: 25%;
+    padding-right: 25%;
+    font-family: "Lucida Console";
+    font-size: 166%;
+}
+
+#post
+{
+    text-align: justify;
+}
+
+hr
+{
+    border: 1px solid darkgray;
+}
+
+#title
+{
+    text-align: center;
+}
+
+#header
+{
+    font-size: 150%;
+    text-align: center;
+}
+
+.about-box
+{
+    border-left: 1px solid darkgray;
+    text-align: justify;
+}
+
+#profile-pic
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#text-input
+{
+    text-align: justify;
+    font-size: 30%;
+}
