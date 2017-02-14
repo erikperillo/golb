@@ -1,2 +1,2 @@
-blog_title = 'erik'
-initial_category = 'hehe'
+blog_title = 'Erik Perillo\'s blog'
+initial_category = 'Random'

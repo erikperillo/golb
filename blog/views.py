@@ -18,26 +18,29 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.template.defaultfilters import slugify
 from django.contrib.auth import logout
 
-LIMIT_RECENT_POSTS = 5
+LIMIT_RECENT_POSTS = 8
+
+def _render(request, template, context, *args):
+    context.update({"blog_title": blog_title})
+    return render(request, template, context, *args)
 
 def index(request):
     if len(Category.objects.all()) < 1:
         Category(title=initial_category).save()
-    return render(request, "index.html", context={
-        "title": blog_title,
+    return _render(request, "index.html", context={
         "categories": Category.objects.all().order_by("title"),
         "posts": Post.objects.all().\
             order_by("-date_created")[:LIMIT_RECENT_POSTS],
         })
 
 def view_post(request, slug):
-    return render(request, "view_post.html", context={
+    return _render(request, "view_post.html", context={
         "post": get_object_or_404(Post, slug=slug)
         })
 
 def view_user(request, slug):
     user_profile = get_object_or_404(UserProfile, slug=slug)
-    return render(request, "view_user.html", context={
+    return _render(request, "view_user.html", context={
         "user": user_profile.user,
         "posts": Post.objects.filter(author=user_profile).\
             order_by("-date_created")[:LIMIT_RECENT_POSTS]
@@ -45,14 +48,14 @@ def view_user(request, slug):
 
 def view_category(request, slug):
     category = get_object_or_404(Category, slug=slug)
-    return render(request, "view_category.html", context={
+    return _render(request, "view_category.html", context={
         "category": category,
         "posts": Post.objects.filter(category=category).\
             order_by("-date_created")[:LIMIT_RECENT_POSTS]
         })
 
 @login_required
-@ensure_csrf_cookie
+#@ensure_csrf_cookie
 def new_post(request):
     # If the request is a HTTP POST, try to pull out the relevant information.
     if request.method == "POST":
@@ -70,11 +73,11 @@ def new_post(request):
 
             return view_post(request, post.slug)
         else:
-            return render(request, "error.html",
+            return _render(request, "error.html",
                 {"message": "Invalid form."})
     else:
         form = PostForm()
-        return render(request, "new_post.html", {"form": form})
+        return _render(request, "new_post.html", {"form": form})
 
 @login_required
 def del_post(request, id):
@@ -82,31 +85,31 @@ def del_post(request, id):
         try:
             post = Post.objects.filter(pk=id).get()
         except:
-            return render(request, "error.html",
+            return _render(request, "error.html",
                 {"message": "Error getting post."})
 
         author = request.user.userprofile
         if author.pk == post.author.pk:
             post.delete()
-            return render(request, "message.html", {"message": "Post deleted."})
+            return _render(request, "message.html", {"message": "Post deleted."})
         else:
-            return render(request, "error.html",
+            return _render(request, "error.html",
                 {"message": "Not authorized to do that."})
     else:
         return HttpResponseRedirect("/index")
 
 @login_required
-@ensure_csrf_cookie
+#@ensure_csrf_cookie
 def edit_post(request, id):
     try:
         post = Post.objects.filter(pk=id).get()
     except:
-        return render(request, "error.html",
+        return _render(request, "error.html",
             {"message": "Error getting post."})
 
     author = request.user.userprofile
     if author.pk != post.author.pk:
-        return render(request, "error.html",
+        return _render(request, "error.html",
             {"message": "Not authorized to do that."})
 
     if request.method == "POST":
@@ -121,7 +124,7 @@ def edit_post(request, id):
             return view_post(request, new_post.slug)
         else:
             post.save()
-            return render(request, "error.html", {"message": "Invalid form."})
+            return _render(request, "error.html", {"message": "Invalid form."})
     else:
         data = {
             "title": post.title,
@@ -130,7 +133,7 @@ def edit_post(request, id):
         }
         form = PostForm(initial=data)
         print("form:", form, "data:", data)
-        return render(request, "edit_post.html", {"form": form, "id": id})
+        return _render(request, "edit_post.html", {"form": form, "id": id})
 
 @ensure_csrf_cookie
 def user_login(request):
@@ -153,18 +156,18 @@ def user_login(request):
                     return HttpResponseRedirect("/index")
                 else:
                     #an inactive account was used - no logging in!
-                    return render(request, "error.html",
+                    return _render(request, "error.html",
                         {"message": "Your account is inactive."})
             else:
                 #bad login details were provided. So we can"t log the user in.
-                return render(request, "error.html",
+                return _render(request, "error.html",
                     {"message": "Invalid login details."})
         else:
             return HttpResponse("Invalid form.")
     else:
         form = LoginForm()
 
-    return render(request, "login.html", {"form": form})
+    return _render(request, "login.html", {"form": form})
 
 @login_required
 def user_logout(request):

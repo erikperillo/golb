@@ -2,7 +2,8 @@
 
 <html>
     <head>
-        <title>{% block head_title %}Golb{% endblock %}</title>
+        <title>{{ blog_title }}</title>
+        <link rel="shortcut icon" type="image/png" href={% static "blog/img/favicon.png" %}/>
         <meta charset="UTF-8">
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -17,13 +18,13 @@
         <div id="header"><h4>
             {% if user.is_authenticated %}
                 Welcome, {{ user.username }} |
-                <a href="/logout">Logout</a> |
-                <a href="/new_post">New post</a> |
+                <a href="/logout/">Logout</a> |
+                <a href="/new_post/">New post</a> |
                 <a href="/user/{{ user.userprofile.slug }}">Profile</a> |
             {% else %}
-                <a href="/login">Login</a> |
+                <a href="/login/">Login</a> |
             {% endif %}
-            <a href="/index">Home</a>
+            <a href="/index/">Home</a>
         </h4></div>
 
         <hr>

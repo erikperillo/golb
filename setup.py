@@ -5,7 +5,6 @@ import os
 
 DEF_CATEGORY = "Random"
 FILE_DIR = os.path.dirname(os.path.realpath(__file__))
-print(FILE_DIR)
 GLOBALS_FILE = os.path.join(FILE_DIR, "blog/globals.py")
 MANAGE_SCRIPT = os.path.join(FILE_DIR, "manage.py")
 
