@@ -1,9 +1,10 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 
 {% block content %}
-    <h3>{{ user.username }}</h3>
+    <h2><center>{{ user.username }}</center></h2>
+    <hr>
+    <h3>Recent posts</h3>
     {% if posts %}
-        <p>Recent posts:</p>
         <ul>
         {% for post in posts %}
             <li><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></li>

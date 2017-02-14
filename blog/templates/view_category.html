@@ -1,8 +1,9 @@
 {% extends 'base.html' %} 
-{% block head_title %}Viewing category {{ category.title }}{% endblock %}
-{% block title %}{{ category.title }}{% endblock %}
 
 {% block content %}
+    <h2><center>Category {{ category.title }}</center></h2>
+    <hr>
+    <h3>Recent posts</h3>
     {% if posts %}
         <ul>
         {% for post in posts %}

@@ -1,5 +1,13 @@
 from blog.models import Post, UserProfile, Category
 from blog.forms import LoginForm, PostForm
+try:
+    from blog.globals import blog_title
+except ImportError:
+    blog_title = "Welcome to Bolg"
+try:
+    from blog.globals import initial_category
+except ImportError:
+    initial_category = "Random"
 
 from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
@@ -13,7 +21,10 @@ from django.contrib.auth import logout
 LIMIT_RECENT_POSTS = 5
 
 def index(request):
+    if len(Category.objects.all()) < 1:
+        Category(title=initial_category).save()
     return render(request, "index.html", context={
+        "title": blog_title,
         "categories": Category.objects.all().order_by("title"),
         "posts": Post.objects.all().\
             order_by("-date_created")[:LIMIT_RECENT_POSTS],

@@ -1,4 +1,4 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 
 {% load markdown_filter %}
 
@@ -9,11 +9,11 @@
 
     {{ post.body|markdownify|safe }}
 
-    <h6 style="text-align: right">Author: {{ post.author }} | Created on: {{ post.date_created }} | 
-    Category: {{ post.category }}</h6>
+    <h6 style="text-align: right">Author: <a href="/user/{{ post.author.slug }}">{{ post.author.user.username }}</a> | Created on: {{ post.date_created }} |
+     Category: {{ post.category }}</h6>
     <hr>
 
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and user == post.author.user%}
     <div class="row">
     <div class="col-xs-2">
     <form id="del_post" action="/del_post/{{ post.id }}/" method="post">

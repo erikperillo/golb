@@ -15,8 +15,6 @@
     </head>
     <body>
         <div id="header"><h4>
-            Erikoso
-            [
             {% if user.is_authenticated %}
                 Welcome, {{ user.username }} |
                 <a href="/logout">Logout</a> |
@@ -26,7 +24,6 @@
                 <a href="/login">Login</a> |
             {% endif %}
             <a href="/index">Home</a>
-            ]
         </h4></div>
 
         <hr>
